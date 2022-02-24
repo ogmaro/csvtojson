@@ -13,22 +13,29 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
+const fs_1 = require("fs");
 const csvtojson_1 = __importDefault(require("csvtojson"));
-const csvFilePath = './data/details.csv';
+const csvFilePath = './build/data/details.csv';
 const PORT = 3000;
 const app = (0, express_1.default)();
 app.get('/convert', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    // Async / await usage
     const jsonArray = yield (0, csvtojson_1.default)().fromFile(csvFilePath);
-    //write a loop to check is any of the data is empty
-    let data = jsonArray.map((value) => {
+    let data = jsonArray.map((value) => __awaiter(void 0, void 0, void 0, function* () {
         if (!value.phone) {
             value.phone = 'missing data';
         }
-        return value;
-    });
-    res.send(data);
+        const myFile = yield fs_1.promises.writeFile('./build/data/details.json', JSON.stringify(JSON.parse(value)));
+    }));
+    res.sendFile(`${__dirname}/data/details.json`);
 }));
+// // json data
+// var jsonData = '{"persons":[{"name":"John","city":"New York"},{"name":"Phil","city":"Ohio"}]}';
+// // parse json
+// var jsonObj = JSON.parse(jsonData);
+// console.log(jsonObj);
+// // stringify JSON Object
+// var jsonContent = JSON.stringify(jsonObj);
+// console.log(jsonContent);
 app.listen(PORT, () => {
     console.log(`Serve running on ${PORT}`);
 });
